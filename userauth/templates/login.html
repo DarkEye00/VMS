@@ -1,0 +1,58 @@
+{% extends "base.html" %}{% block content %}
+
+<section
+  class="flex flex-col items-center bg-gradient-to-tr from-teal-400 to-violet-600/70 border-1 w-full h-[100vh] text-gray-700 p-5 mt-5"
+>
+  <!--------------Log in Form------------------>
+
+  <div class="w-auto h-auto bg-slate-100 rounded-lg">
+    <h3 class="text-center text-teal-500 font-semibold text-xl p-2">
+      Visitor Management System
+    </h3>
+    <p class="italic px-3">
+      New User ? click
+      <a href="{% url 'userauth:register' %}" class="underline text-blue-600"
+        >here</a
+      >
+      to Register new account
+    </p>
+    <div class="p-5 flex justify-center">
+      <div>
+        {% if form.errors %}
+    
+        <div class="w-auto p-2 rounded-md bg-red-300 text-base">
+          <strong>{{form.errors}}</strong>
+        </div>
+
+        {% endif %}
+        <h4 class="text-teal-500 font-semibold text-xl">Login</h4>
+
+        <form class="flex flex-col space-y-3" method="POST">
+          {% csrf_token %}
+          <input
+            type="text"
+            class="bg-gray-300/60 w-[250px] rounded-[7px] p-3 shadow-sm border border-gray-400"
+            name="email"
+            placeholder="Email Address"
+            required
+          />
+
+          <input
+            type="password"
+            name="password"
+            class="bg-gray-300/30 w-[250px] rounded-[7px] p-3 shadow-sm border border-gray-600"
+            placeholder="Password"
+          />
+
+          <button
+            class="bg-teal-500 w-32 p-2 rounded-lg font-medium text-gray-100"
+            type="submit"
+          >
+            LogIn
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
