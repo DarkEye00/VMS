@@ -12,6 +12,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.views import PasswordChangeView
 from django.urls import reverse_lazy
+from django.http import JsonResponse
 
 # Create your views here.+254102215152
 def register(request):
@@ -65,10 +66,6 @@ def login_view(request):
     
     # checking if a user is logged in
     
-    if request.user.is_authenticated:
-        messages.warning(request, "You are already logged in.")
-        return redirect("userauth:security")  # Default to security for now
-
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
@@ -131,8 +128,11 @@ def verify_otp(request):
 
     return render(request, "verify_otp.html")
 
-def logout(request):
-    logout()
+@login_required
+def logout_view(request):
+    logout(request)
+    messages.success(request, "You have logged out")
+    return redirect("userauth:login")
 
 @login_required
 def security_view(request):
@@ -179,6 +179,7 @@ def security_view(request):
         
     })
 
+@login_required
 def check_out(request, visitor_id):
     visitor = get_object_or_404(Visitor, id=visitor_id)
     if visitor.check_out is None:
@@ -189,9 +190,24 @@ def check_out(request, visitor_id):
         messages.warning(request, f"{visitor.name} has already checked out.")
     return redirect('userauth:security')
 
+@login_required
 def host_view(request):
-    # Placeholder for host view logic
-    return render(request, 'host.html')
+    
+    # Fetch today's visitors
+    today = timezone.now().date()
+    visitors_today = Visitor.objects.filter(check_in=today)
+    
+    # Fetch upcoming visitors
+    upcoming_visitors = Visitor.objects.filter(check_in=timezone.now())
+    
+    
+    context = {
+        'visitors_today': visitors_today.count(),
+        'upcoming_visitors': upcoming_visitors,
+        
+    }
+
+    return render(request, 'host.html', context)
 
 @login_required
 def security_profile(request):

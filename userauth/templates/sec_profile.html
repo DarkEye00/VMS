@@ -1,9 +1,13 @@
 {% extends 'base.html' %}
-{% load static %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto p-6 bg-white shadow rounded-lg">
+<div class="max-w-3xl mx-auto my-20  p-6 bg-white shadow rounded-lg ">
+    <div class="flex justify-between">
   <h2 class="text-2xl font-bold mb-4">Security Profile</h2>
+  <a href="{% url 'userauth:security' %}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+    Back to Dashboard
+  </a>
+  </div>
 
     {% if messages %}
         {% for message in messages %}
@@ -50,11 +54,6 @@
     </div>
   </div>
 
-  <div class="mt-6">
-    <a href="{% url 'userauth:security' %}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-      Back to Dashboard
-    </a>
-  </div>
   <a href="{% url 'userauth:password_change' %}" class="text-blue-600 hover:underline">Change Password</a>
 
 </div>

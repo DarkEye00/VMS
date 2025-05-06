@@ -9,6 +9,16 @@
     <h3 class="text-center text-teal-500 font-semibold text-xl p-2">
       Visitor Management System
     </h3>
+    {% if messages %} {% for message in messages %}
+
+            <div
+              id="notify"
+              class="w-[90%] h-8 flex items-center my-2 ml-2 p-5 rounded-md bg-cyan-500/40 border-[1px] border-gray-700/40 {{message.tags}}"
+            >
+              {{message}}
+            </div>
+      
+            {% endfor %} {% endif %}
     <p class="italic px-3">
       New User ? click
       <a href="{% url 'userauth:register' %}" class="underline text-blue-600"
@@ -45,7 +55,7 @@
           />
 
           <button
-            class="bg-teal-500 w-32 p-2 rounded-lg font-medium text-gray-100"
+            class="bg-teal-500 w-32 p-2 rounded-lg cursor-pointer font-medium text-gray-100"
             type="submit"
           >
             LogIn
@@ -55,4 +65,13 @@
     </div>
   </div>
 </section>
+<script>
+  // Get a reference to the div
+  var myDiv = document.getElementById("notify");
+
+  // Use setTimeout to hide the div after 2000 milliseconds (2 seconds)
+  setTimeout(function () {
+    myDiv.style.display = "none";
+  }, 1000);
+</script>
 {% endblock %}

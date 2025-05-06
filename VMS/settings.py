@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'userauth',
-   
+    'channels',
    
 ]
 
@@ -72,6 +72,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'VMS.wsgi.application'
 
+ASGI_APPLICATION = 'VMS.asgi.application'
+
+# Add this to use Redis as the channel layer
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
