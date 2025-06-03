@@ -62,3 +62,16 @@ class UserRegistrationForm(UserCreationForm):
         if User.objects.filter(email__iexact=email).exists():
             raise forms.ValidationError("A user with that email already exists.")
         return email
+
+from .models import StaffCheckInOut
+
+class StaffCheckInOutForm(forms.ModelForm):
+    class Meta:
+        model = StaffCheckInOut
+        fields = ['name', 'id_no', 'laptop_tag_no', 'department']
+        widgets = {
+            'Name': forms.TextInput(attrs={'class': 'form-control'}),
+            'Id_no': forms.TextInput(attrs={'class': 'form-control'}),
+            'laptop_Asset_Tag': forms.TextInput(attrs={'class': 'form-control'}),
+            'Department': forms.TextInput(attrs={'class': 'form-control'}),
+        }

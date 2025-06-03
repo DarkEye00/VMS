@@ -74,4 +74,24 @@ class EmailOTP(models.Model):
         return timezone.now() > self.created_at + timedelta(minutes=10)
 
     def __str__(self):
-        return f"OTP for {self.user.username} - {self.otp_code}"
+        return f"OTP for {self.user.username} - {self.code}"
+    
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.message
+
+class StaffCheckInOut(models.Model):
+    name = models.CharField(max_length=100)
+    id_no = models.CharField(max_length=50)
+    laptop_tag_no = models.CharField(max_length=50)
+    department = models.CharField(max_length=100)
+    time_in = models.DateTimeField(default=timezone.now)
+    time_out = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.department}"

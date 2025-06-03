@@ -1,12 +1,12 @@
-{% extends "base.html" %}{% block content %}
+{% extends "pre.html" %}{% block content %}
 
 <section
-  class="flex flex-col items-center bg-gradient-to-tr from-teal-400 to-violet-600/70 border-1 w-full h-[100vh] text-gray-700 p-5 mt-5"
+  class="flex flex-col items-center w-full h-[100vh] text-gray-700 p-5"
 >
   <!--------------Log in Form------------------>
 
   <div class="w-auto h-auto bg-slate-100 rounded-lg">
-    <h3 class="text-center text-teal-500 font-semibold text-xl p-2">
+    <h3 class="text-center text-green-600 font-semibold text-xl p-2">
       Visitor Management System
     </h3>
     {% if messages %} {% for message in messages %}
@@ -35,7 +35,7 @@
         </div>
 
         {% endif %}
-        <h4 class="text-teal-500 font-semibold text-xl">Login</h4>
+        <h4 class="text-green-600 font-semibold text-xl">Login</h4>
 
         <form class="flex flex-col space-y-3" method="POST">
           {% csrf_token %}
@@ -55,7 +55,7 @@
           />
 
           <button
-            class="bg-teal-500 w-32 p-2 rounded-lg cursor-pointer font-medium text-gray-100"
+            class="bg-green-600 w-32 p-2 rounded-lg cursor-pointer font-medium text-gray-100"
             type="submit"
           >
             LogIn

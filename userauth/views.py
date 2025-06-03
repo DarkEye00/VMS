@@ -2,7 +2,7 @@ import random
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from userauth.forms import UserRegistrationForm
-from userauth.models import User, Group, Visitor, EmailOTP
+from userauth.models import Notification, User, Group, Visitor, EmailOTP
 from django.contrib import messages
 from django.utils import timezone
 from django.utils.timezone import now
@@ -12,9 +12,13 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.views import PasswordChangeView
 from django.urls import reverse_lazy
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+from datetime import datetime, timedelta
+import csv
+from .forms import StaffCheckInOutForm
+from .models import StaffCheckInOut
 
-# Create your views here.+254102215152
+# Create your views here.
 def register(request):
 
     if request.method == "POST":
@@ -79,7 +83,7 @@ def login_view(request):
 
             send_mail(
                 "Your OTP Code",
-                f"Your Login verification code is: {otp}",
+                f"Your Login verification code is: {otp}\n\ If you did not request this, please ignore this email.",
                 settings.DEFAULT_FROM_EMAIL,
                 [user.email],
                 fail_silently=False
@@ -161,6 +165,16 @@ def security_view(request):
                     check_in=timezone.now(),
                     created_by=request.user
                 )
+
+                    # Create a notification for the host
+                send_mail(
+                subject="New Visitor Checked In",
+                message=f"Hello {host.username},\n\nYou have a new visitor: {name}.\nPhone: {phone}\nReason: {reason}\nChecked in at: {timezone.now().strftime('%d %b %Y, %I:%M %p')}",
+                from_email=settings.DEFAULT_FROM_EMAIL,  # can be anything
+                recipient_list=[host.email],
+                fail_silently=False
+            )
+
                 messages.success(request, f"{name} checked in successfully.")
                 return redirect('userauth:security')
             else:
@@ -192,43 +206,70 @@ def check_out(request, visitor_id):
 
 @login_required
 def host_view(request):
-    
-    # Fetch today's visitors
     today = timezone.now().date()
-    visitors_today = Visitor.objects.filter(check_in=today)
-    
-    # Fetch upcoming visitors
-    upcoming_visitors = Visitor.objects.filter(check_in=timezone.now())
-    
-    
+    now = timezone.now()
+
+    # Get visitors for the host today
+    visitors_today = Visitor.objects.filter(host=request.user, check_in__date=today)
+
+     # Visitors checked in by this host (all-time)
+    visitors_by_host = Visitor.objects.filter(host=request.user).order_by('-check_in')
+
+    # Upcoming visitors (later today)
+    upcoming_visitors = visitors_today.filter(check_in__gt=now)
+
+    # Full visitor history for the host
+    visitor_history = Visitor.objects.filter(host=request.user).order_by('-check_in')
+
     context = {
-        'visitors_today': visitors_today.count(),
+        'visitors_today': visitors_today,
         'upcoming_visitors': upcoming_visitors,
-        
+        'visitor_history': visitor_history,
+        'visitors_by_host': visitors_by_host,
     }
 
     return render(request, 'host.html', context)
 
 @login_required
+def export_visitors_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=visitor_history.csv'
+
+    writer = csv.writer(response)
+    writer.writerow(['Name', 'Phone', 'Reason', 'Check-in', 'Check-out'])
+
+    visitors = Visitor.objects.filter(host=request.user).order_by('-check_in')
+
+    for v in visitors:
+        check_in = v.check_in.strftime('%d %b %Y, %I:%M %p') if v.check_in else 'N/A'
+        check_out = v.check_out.strftime('%d %b %Y, %I:%M %p') if v.check_out else 'Still inside'
+        writer.writerow([v.name, v.phone, v.reason, check_in, check_out])
+
+    return response
+
+@login_required
 def security_profile(request):
     user = request.user
 
-    # Get today's date range
-    today = now().date()
-    visitors_today = Visitor.objects.filter(
-        check_in__date=today,
-        created_by=user  
-    )
-    visitor_count = visitors_today.count()
+    today = timezone.now().date()
+
+    if user.role == 'host':
+        visitors_today = Visitor.objects.filter(host=user, check_in__date=today)
+        role = 'host'
+    else:
+        visitors_today = Visitor.objects.filter(created_by=user, check_in__date=today)
+        role = 'security'
 
     context = {
         'user': user,
         'visitors_today': visitors_today,
-        'visitor_count': visitor_count,
+        'visitor_count': visitors_today.count(),
         'now': timezone.now(),
+        'role': role,
     }
 
-    return render(request, 'sec_profile.html', context)
+    return render(request, 'profile.html', context)
+
 
 class CustomPasswordChangeView(PasswordChangeView):
     template_name = 'password_change.html'  # your custom template
@@ -237,3 +278,41 @@ class CustomPasswordChangeView(PasswordChangeView):
     def form_valid(self, form):
         messages.success(self.request, "Password changed successfully!")
         return super().form_valid(form)
+
+@login_required
+def send_notification(request):
+    # This would be triggered by some event in your app, e.g., user check-in
+    notification = Notification.objects.create(
+        user=request.user,  # Or any specific user
+        message="New visitor check-in!"
+    )
+    return JsonResponse({'message': 'Notification sent!'})
+
+@login_required
+def staff_check_in(request):
+    if request.method == 'POST':
+        form = StaffCheckInOutForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('userauth:staff_logs')
+    else:
+        form = StaffCheckInOutForm()
+    return render(request, 'staff.html', {'form': form})
+
+@login_required
+def staff_check_out(request, staff_id):
+    staff = get_object_or_404(StaffCheckInOut, id=staff_id)
+
+    if staff.time_out is None:
+        staff.time_out = timezone.now()
+        staff.save()
+        messages.success(request, f"{staff.name} checked out successfully.")
+    else:
+        messages.warning(request, f"{staff.name} has already checked out.")
+    return redirect('userauth:staff_logs')
+
+
+@login_required
+def staff_logs(request):
+    logs = StaffCheckInOut.objects.all().order_by('-time_in')
+    return render(request, 'staff_logs.html', {'logs': logs})

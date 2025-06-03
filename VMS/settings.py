@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +27,7 @@ SECRET_KEY = 'django-insecure-b2ceu)k6a8j_*f&l3mi@*n_&oq+x4_&9q6z93z(i@1qb_eha#i
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -140,16 +141,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "userauth.User"
 
-"""EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  # or your mail provider's SMTP
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'josephodhiambo509@gmail.com'
-EMAIL_HOST_PASSWORD = 'safg siwz sdwq kswn'  # not your email password, see note below
-DEFAULT_FROM_EMAIL = 'josephodhiambo509@gmail.com'"""
+EMAIL_HOST_USER = 'apikey'  # literally 'apikey', not your username
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'noreply@example.com'
+DEFAULT_FROM_EMAIL = 'vms.notify@offshoreafrica.org'  # Replace with your verified sender
+
 
 TIME_ZONE = 'Africa/Nairobi'
 USE_TZ = True

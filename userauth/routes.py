@@ -16,5 +16,8 @@ urlpatterns = [
     path("verify/", views.verify_otp, name="verify"),
     path('security/profile/', views.security_profile, name='profile'),
     path('password-change/', CustomPasswordChangeView.as_view(), name='password_change'),
-
+    path("export-csv/", views.export_visitors_csv, name="export_csv"),
+    path('staff/check-in/', views.staff_check_in, name='staff_check_in'),
+    path('staff/check-out/<int:staff_id>/', views.staff_check_out, name='staff_check_out'),
+    path('staff/logs/', views.staff_logs, name='staff_logs'),
 ]

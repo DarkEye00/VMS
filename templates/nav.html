@@ -10,15 +10,15 @@
 </head>
 
 <body class="text-gray-800 bg-gray-200">
-    <header class="bg-blue-600 text-white">
-        <div class="container mx-auto flex justify-between items-center py-4 px-6">
+    <header class="bg-white">
+          <div class="container mx-auto flex justify-between items-center py-4 px-6">
             <h1 class="text-2xl font-bold">LOGO</h1>
             <div>
                 <span class="text-sm">Welcome, {{ user.username }}</span>
             </div>
         </div>
-    </header>
-       {% if messages %} {% for message in messages %}
+      </header>
+        {% if messages %} {% for message in messages %}
 
             <div
               id="notify"
@@ -33,8 +33,8 @@
     <aside class="bg-green-900 text-white w-full md:w-64 p-4 space-y-6 md:min-h-screen sticky top-0 z-10">
       <h1 class="text-xl md:text-2xl font-bold text-center md:text-left">DASHBOARD</h1>
       <nav class="space-y-5">
-        <a href="{% url 'userauth:host' %}"class="block w-full px-4 py-2 bg-green-600 rounded hover:bg-gray-700 text-center md:text-left">Home</a>
-      
+        <a href="{% url 'userauth:security' %}"class="block w-full px-4 py-2 bg-green-600 rounded hover:bg-gray-700 text-center md:text-left">Home</a>
+      <a href="{% url 'userauth:staff_check_in' %}"class="block w-full px-4 py-2 bg-green-600 rounded hover:bg-gray-700 text-center md:text-left">Staff CheckIn</a>
       <button class="block w-full px-4 py-2 bg-green-600 rounded hover:bg-gray-700 text-center md:text-left">Shift Logs</button>
       <button class="block w-full px-4 py-2 bg-red-700 rounded hover:bg-red-600 text-center md:text-left">Emergency Mode</button>
        <a href="{% url 'userauth:password_change' %}" class="block w-full px-4 py-2 bg-green-600 rounded hover:bg-gray-700 text-center md:text-left">Change Password</a>
@@ -42,12 +42,16 @@
       <a href="{% url 'userauth:logout' %}" class="block w-full px-4 py-2 bg-green-600 rounded hover:bg-gray-700 text-center md:text-left">Log Out</a>
       </nav>
       </aside>
-
- <main class="w-full flex">
+<main class="w-full flex">
     {% block content %}
     {% endblock %}
 </main>
-
+<script>
+  setTimeout(() => {
+    const notify = document.getElementById("notify");
+    if (notify) notify.style.display = "none";
+  }, 2000);
+</script>
 </body>
 
 </html>

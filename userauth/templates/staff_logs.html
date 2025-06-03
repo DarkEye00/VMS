@@ -1,0 +1,69 @@
+{% extends 'nav.html' %}
+
+{% block content %}
+<section>
+<h2 class="text-2xl font-bold my-4 ml-10">Warehouse Staff Logs</h2>
+{% if messages %} {% for message in messages %}
+
+            <div
+              id="notify"
+              class="w-[90%] h-8 flex items-center my-2 ml-2 p-5 rounded-md bg-cyan-500/40 border-[1px] border-gray-700/40 {{message.tags}}"
+            >
+              {{message}}
+            </div>
+      
+            {% endfor %} {% endif %}
+<div class="p-10">
+<table class="min-w-full bg-white shadow-md rounded overflow-hidden">
+    <thead class="bg-gray-200 text-left">
+        <tr>
+            <th class="p-3">Name</th>
+            <th class="p-3">ID No</th>
+            <th class="p-3">Laptop Tag No</th>
+            <th class="p-3">Department</th>
+            <th class="p-3">Time In</th>
+            <th class="p-3">Time Out</th>
+            <th class="p-3">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for log in logs %}
+        <tr class="border-t">
+            <td class="p-3">{{ log.name }}</td>
+            <td class="p-3">{{ log.id_no }}</td>
+            <td class="p-3">{{ log.laptop_tag_no }}</td>
+            <td class="p-3">{{ log.department }}</td>
+            <td class="p-3">{{ log.time_in }}</td>
+            <td class="p-3">
+                {% if log.time_out %}
+                    {{ log.time_out }}
+                {% else %}
+                    <span class="text-yellow-500">--</span>
+                {% endif %}
+            </td>
+            <td class="p-3">
+                {% if not log.time_out %}
+                    <a href="{% url 'userauth:staff_check_out' log.id %}" class="text-white bg-green-600 px-3 py-1 rounded hover:bg-green-700">Check Out</a>
+                {% else %}
+                    <span class="text-gray-500">Checked Out</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="p-3 text-center text-gray-500">No logs available.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'userauth:staff_check_in'%}" class="mt-5 text-white bg-green-600 px-3 py-1 rounded hover:bg-green-700 inline-block">Back</a>
+</div>
+</section>
+<script>
+  // Get a reference to the div
+  var myDiv = document.getElementById("notify");
+
+  // Use setTimeout to hide the div after 2000 milliseconds (2 seconds)
+  setTimeout(function () {
+    myDiv.style.display = "none";
+  }, 1000);
+</script>
+{% endblock %}
